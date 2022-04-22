@@ -2,7 +2,9 @@ package com.example.mq.mq;
 
 
 import com.example.mq.model.Client;
+import com.example.mq.model.TransferHistory;
 import com.example.mq.repository.ClientRepository;
+import com.example.mq.repository.TransferHistoryRepository;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import java.util.List;
 public class MessageListener {
    @Autowired
 ClientRepository clientRepository;
+    @Autowired
+   TransferHistoryRepository transferHistoryRepository;
 
    @RabbitListener(queues = MQConfig.QUEUE)
     public String listener(CustomMessage message) {
@@ -22,6 +26,15 @@ ClientRepository clientRepository;
 
       List<Client> clients = clientRepository.findByCard(message.getCardOfReceiver());
       List<Client> clientSender = clientRepository.findByCard(message.getCardOfHolder());
+
+      TransferHistory transferHistory = new TransferHistory();
+      transferHistory.setCardHolderName(message.getCardHolderName());
+      transferHistory.setCardOfHolder(message.getCardOfHolder());
+      transferHistory.setCardReceiverName(message.getCardReceiverName());
+      transferHistory.setCardOfReceiver(message.getCardOfReceiver());
+      transferHistory.setBankAccount(message.getCash());
+
+       transferHistoryRepository.save(transferHistory);
 
       if (clientSender.size() > 0 && clients.size() > 0) {
 
@@ -40,6 +53,8 @@ ClientRepository clientRepository;
       } else {
          return "Одна из карт не найдена";
       }
+
+
 
    }
 
