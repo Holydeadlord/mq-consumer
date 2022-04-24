@@ -14,5 +14,4 @@ public interface TransferHistoryRepository extends JpaRepository<TransferHistory
    // List<TransferHistory> findBycardReceiverName(String cardReceiverName);
    // List<TransferHistory> findBycardOfReceiver(String cardOfReceiver);
    // List<TransferHistory> findBycash(String cash);
-
 }

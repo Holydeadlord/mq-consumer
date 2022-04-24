@@ -25,18 +25,12 @@ ClientRepository clientRepository;
     public String listener(CustomMessage message) {
       System.out.println(message);
 
-      List<Client> clients = clientRepository.findByCard(message.getCardOfReceiver());
-      List<Client> clientSender = clientRepository.findByCard(message.getCardOfHolder());
 
-      TransferHistory transferHistory = new TransferHistory();
-      transferHistory.setCardHolderName(message.getCardHolderName());
-      transferHistory.setCardOfHolder(message.getCardOfHolder());
-      transferHistory.setCardReceiverName(message.getCardReceiverName());
-      transferHistory.setCardOfReceiver(message.getCardOfReceiver());
-      transferHistory.setBankAccount(message.getCash());
-      transferHistory.setDate(new Date());
+     List<Client> clients = clientRepository.findByCardLike(message.getCardOfReceiver());
+      //clients=clientRepository.findByCard(message.getCardOfReceiver());
+       //List<Client> clients = clientRepository.findByCard(message.getCardOfReceiver());
+      List<Client> clientSender = clientRepository.findByCardLike(message.getCardOfHolder());
 
-       transferHistoryRepository.save(transferHistory);
 
       if (clientSender.size() > 0 && clients.size() > 0) {
 
@@ -48,6 +42,16 @@ ClientRepository clientRepository;
             Client sender = clientSender.get(0);
             sender.setCash(sender.getCash() - message.getCash());
             clientRepository.save(sender);
+
+             TransferHistory transferHistory = new TransferHistory();
+             transferHistory.setCardHolderName(message.getCardHolderName());
+             transferHistory.setCardOfHolder(message.getCardOfHolder());
+             transferHistory.setCardReceiverName(message.getCardReceiverName());
+             transferHistory.setCardOfReceiver(message.getCardOfReceiver());
+             transferHistory.setBankAccount(message.getCash());
+             transferHistory.setDate(new Date());
+
+             transferHistoryRepository.save(transferHistory);
             return "OK";
          } else {
             return "Недостаточно средств на балансе";
